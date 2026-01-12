@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spanish Conjugation Quiz</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <div class="app-container">
+        <header>
+            <h1>Spanish Verbs</h1>
+            <div class="stats">
+                <span>Streak: <b id="streak-counter">0</b></span>
+            </div>
+        </header>
+
+        <div class="controls">
+            <label for="tense-select">Tense:</label>
+            <select id="tense-select">
+                <optgroup label="Indicative Mood (Modo Indicativo)">
+                    <option value="indicative.present">Presente (Present)</option>
+                    <option value="indicative.preterite" selected>Pretérito (Simple Past)</option>
+                    <option value="indicative.imperfect">Imperfecto (Past Descriptive)</option>
+                    <option value="indicative.future">Futuro Simple (Future)</option>
+                    <option value="indicative.conditional">Condicional Simple (Conditional)</option>
+                    <option value="indicative.present_perfect">Pretérito Perfecto Compuesto (Present Perfect)</option>
+                    <option value="indicative.past_perfect">Pluscuamperfecto (Past Perfect)</option>
+                    <option value="indicative.future_perfect">Futuro Compuesto (Future Perfect)</option>
+                    <option value="indicative.conditional_perfect">Condicional Compuesto (Conditional Perfect)</option>
+                </optgroup>
+                <optgroup label="Subjunctive Mood (Modo Subjuntivo)">
+                    <option value="subjunctive.present">Presente de Subjuntivo</option>
+                    <option value="subjunctive.imperfect">Imperfecto de Subjuntivo</option>
+                    <option value="subjunctive.present_perfect">Pretérito Perfecto de Subjuntivo</option>
+                </optgroup>
+                <optgroup label="Imperative Mood (Modo Imperativo)">
+                    <option value="imperative.positive">Imperativo Afirmativo (Commands)</option>
+                    <option value="imperative.negative">Imperativo Negativo (Negative Commands)</option>
+                </optgroup>
+                <optgroup label="Non-Finite Forms (Formas no Personales)">
+                    <option value="non_finite.infinitive">Infinitivo (Infinitive)</option>
+                    <option value="non_finite.gerund">Gerundio (Gerund)</option>
+                    <option value="non_finite.past_participle">Participio Pasado (Past Participle)</option>
+                </optgroup>
+            </select>
+        </div>
+
+        <main class="card">
+            <div class="prompt">
+                <p class="pronoun" id="prompt-pronoun">...</p>
+                <h2 class="verb" id="prompt-verb">...</h2>
+                <p class="translation" id="prompt-translation">...</p>
+            </div>
+
+            <div class="input-area">
+                <input type="text" id="answer-input" placeholder="Type conjugation here..." autocomplete="off">
+                
+                <div class="virtual-keyboard">
+                    <button type="button" data-char="á">á</button>
+                    <button type="button" data-char="é">é</button>
+                    <button type="button" data-char="í">í</button>
+                    <button type="button" data-char="ó">ó</button>
+                    <button type="button" data-char="ú">ú</button>
+                    <button type="button" data-char="ñ">ñ</button>
+                </div>
+            </div>
+
+            <button id="check-btn" class="primary-btn">Check Answer</button>
+            <button id="next-btn" class="secondary-btn hidden">Next Verb</button>
+
+            <div id="feedback" class="feedback hidden">
+                <p id="feedback-msg"></p>
+                <p id="correct-answer-display" class="hidden">Correct: <span id="correct-text"></span></p>
+            </div>
+        </main>
+
+        <footer class="info-box">
+            <h3>Quick Tip:</h3>
+            <p id="tense-tip">The Preterite is for completed past actions. (e.g., "Yesterday I ate.")</p>
+        </footer>
+    </div>
+
+    <script src="verbs.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
