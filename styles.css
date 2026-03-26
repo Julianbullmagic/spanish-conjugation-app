@@ -57,7 +57,11 @@ h1 {
 }
 
 .controls {
-    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
 }
 
 select {
@@ -204,6 +208,71 @@ button:active {
     margin-top: 5px;
     font-weight: bold;
     color: var(--text-color);
+}
+
+.mode-btn {
+    padding: 7px 16px;
+    border: 2px solid var(--primary-color);
+    border-radius: 20px;
+    background: white;
+    color: var(--primary-color);
+    font-size: 0.9rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+    white-space: nowrap;
+}
+
+.mode-btn:hover {
+    background: var(--secondary-color);
+}
+
+.mode-btn.active {
+    background: var(--primary-color);
+    color: white;
+}
+
+select.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.tense-label {
+    display: inline-block;
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: var(--primary-dark);
+    background: var(--secondary-color);
+    padding: 3px 12px;
+    border-radius: 12px;
+    margin-bottom: 4px;
+    letter-spacing: 0.03em;
+}
+
+.action-row {
+    display: flex;
+    gap: 10px;
+}
+
+.action-row > button {
+    flex: 1;
+}
+
+.danger-btn {
+    padding: 10px;
+    border: 1px solid var(--error-color);
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    cursor: pointer;
+    background-color: #ffebee;
+    color: var(--error-color);
+    transition: background 0.2s, color 0.2s;
+}
+
+.danger-btn:hover {
+    background-color: var(--error-color);
+    color: white;
 }
 
 .info-box {

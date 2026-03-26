@@ -45,10 +45,12 @@
                     <option value="non_finite.past_participle">Participio Pasado (Past Participle)</option>
                 </optgroup>
             </select>
+            <button id="random-btn" class="mode-btn">Random Mode</button>
         </div>
 
         <main class="card">
             <div class="prompt">
+                <p id="random-tense-label" class="tense-label hidden"></p>
                 <p class="pronoun" id="prompt-pronoun">...</p>
                 <h2 class="verb" id="prompt-verb">...</h2>
                 <p class="translation" id="prompt-translation">...</p>
@@ -56,7 +58,7 @@
 
             <div class="input-area">
                 <input type="text" id="answer-input" placeholder="Type conjugation here..." autocomplete="off">
-                
+
                 <div class="virtual-keyboard">
                     <button type="button" data-char="á">á</button>
                     <button type="button" data-char="é">é</button>
@@ -68,12 +70,18 @@
             </div>
 
             <button id="check-btn" class="primary-btn">Check Answer</button>
-            <button id="next-btn" class="secondary-btn hidden">Next Verb</button>
+
+            <div class="action-row">
+                <button id="back-btn" class="secondary-btn hidden">← Back</button>
+                <button id="next-btn" class="secondary-btn hidden">Next Verb</button>
+            </div>
 
             <div id="feedback" class="feedback hidden">
                 <p id="feedback-msg"></p>
                 <p id="correct-answer-display" class="hidden">Correct: <span id="correct-text"></span></p>
             </div>
+
+            <button id="remove-btn" class="danger-btn hidden">Remove This Question</button>
         </main>
 
         <footer class="info-box">
