@@ -37,6 +37,11 @@ const streakEl = document.getElementById('streak-counter');
 const tenseSelect = document.getElementById('tense-select');
 const tenseTip = document.getElementById('tense-tip');
 const virtualKeys = document.querySelectorAll('.virtual-keyboard button');
+const showConjugationsBtn = document.getElementById('show-conjugations-btn');
+const conjugationTableContainer = document.getElementById('conjugation-table-container');
+const conjugationTableTitle = document.getElementById('conjugation-table-title');
+const conjugationThead = document.getElementById('conjugation-thead');
+const conjugationTbody = document.getElementById('conjugation-tbody');
 
 // --- Tips ---
 const TIPS = {
@@ -138,6 +143,8 @@ function setupEventListeners() {
             inputEl.focus();
         });
     });
+
+    showConjugationsBtn.addEventListener('click', toggleConjugationTable);
 }
 
 function updateTip() {
@@ -165,6 +172,8 @@ function generateQuestion() {
     nextBtn.classList.add('hidden');
     correctAnswerDisplayEl.classList.add('hidden');
     randomTenseLabel.classList.add('hidden');
+    showConjugationsBtn.classList.add('hidden');
+    conjugationTableContainer.classList.add('hidden');
 
     inputEl.focus();
 
@@ -323,6 +332,8 @@ function loadHistoryEntry(index) {
         checkBtn.classList.remove('hidden');
         nextBtn.classList.add('hidden');
         correctAnswerDisplayEl.classList.add('hidden');
+        showConjugationsBtn.classList.add('hidden');
+        conjugationTableContainer.classList.add('hidden');
     }
 
     updateNavButtons();
@@ -424,6 +435,8 @@ function checkAnswer() {
     feedbackEl.classList.remove('hidden');
     checkBtn.classList.add('hidden');
     nextBtn.classList.remove('hidden');
+    showConjugationsBtn.classList.remove('hidden');
+    conjugationTableContainer.classList.add('hidden');
 
     const isCorrect = userAnswer === correctAnswer;
 
@@ -489,6 +502,77 @@ function handleIncorrect(answer) {
     feedbackMsgEl.innerHTML = "<strong>Incorrecto.</strong>";
     correctAnswerDisplayEl.classList.remove('hidden');
     correctTextEl.textContent = answer;
+}
+
+// --- Conjugation Table ---
+function toggleConjugationTable() {
+    const isVisible = !conjugationTableContainer.classList.contains('hidden');
+    if (isVisible) {
+        conjugationTableContainer.classList.add('hidden');
+        showConjugationsBtn.textContent = 'Show All Conjugations';
+    } else {
+        buildConjugationTable();
+        conjugationTableContainer.classList.remove('hidden');
+        showConjugationsBtn.textContent = 'Hide Conjugations';
+    }
+}
+
+function buildConjugationTable() {
+    let verb, mood, tense, pronounIndex;
+
+    if (randomMode) {
+        verb = VERB_DATA[currentVerbIndex];
+        mood = currentMood;
+        tense = currentTense;
+        pronounIndex = currentPronounIndex;
+    } else {
+        verb = currentVerb;
+        const mt = getMoodAndTense();
+        mood = mt.mood;
+        tense = mt.tense;
+        pronounIndex = currentPronounIndex;
+    }
+
+    const tenseName = TENSE_NAMES[`${mood}.${tense}`] || '';
+    conjugationTableTitle.textContent = `${verb.infinitive} — ${tenseName}`;
+
+    // Clear previous content
+    conjugationThead.innerHTML = '';
+    conjugationTbody.innerHTML = '';
+
+    if (mood === 'non_finite') {
+        // Non-finite forms: single row
+        const headerRow = document.createElement('tr');
+        headerRow.innerHTML = '<th>Form</th><th>Conjugation</th>';
+        conjugationThead.appendChild(headerRow);
+
+        const bodyRow = document.createElement('tr');
+        const formLabel = tense === 'infinitive' ? 'Infinitivo' : tense === 'gerund' ? 'Gerundio' : 'Participio';
+        bodyRow.innerHTML = `<td class="pronoun-cell">${formLabel}</td><td>${verb[tense]}</td>`;
+        conjugationTbody.appendChild(bodyRow);
+    } else {
+        // Standard 2-column table: Pronoun | Conjugation
+        const headerRow = document.createElement('tr');
+        headerRow.innerHTML = '<th>Subject</th><th>Conjugation</th>';
+        conjugationThead.appendChild(headerRow);
+
+        const pronounList = mood === 'imperative' ? PRONOUNS.imperative : PRONOUNS.standard;
+        let conjugations;
+        if (mood === 'imperative') {
+            conjugations = verb.conjugations.imperative[tense];
+        } else {
+            conjugations = verb.conjugations[mood][tense];
+        }
+
+        for (let i = 0; i < pronounList.length; i++) {
+            const row = document.createElement('tr');
+            const isHighlighted = (i === pronounIndex);
+            const pronounClass = 'pronoun-cell';
+            const conjClass = isHighlighted ? 'highlight' : '';
+            row.innerHTML = `<td class="${pronounClass}">${pronounList[i]}</td><td class="${conjClass}">${conjugations[i]}</td>`;
+            conjugationTbody.appendChild(row);
+        }
+    }
 }
 
 function insertAtCursor(input, text) {
