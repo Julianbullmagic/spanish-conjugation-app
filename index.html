@@ -16,36 +16,39 @@
             </div>
         </header>
 
-        <div class="controls">
-            <label for="tense-select">Tense:</label>
-            <select id="tense-select">
-                <optgroup label="Indicative Mood (Modo Indicativo)">
-                    <option value="indicative.present">Presente (Present)</option>
-                    <option value="indicative.preterite" selected>Pretérito (Simple Past)</option>
-                    <option value="indicative.imperfect">Imperfecto (Past Descriptive)</option>
-                    <option value="indicative.future">Futuro Simple (Future)</option>
-                    <option value="indicative.conditional">Condicional Simple (Conditional)</option>
-                    <option value="indicative.present_perfect">Pretérito Perfecto Compuesto (Present Perfect)</option>
-                    <option value="indicative.past_perfect">Pluscuamperfecto (Past Perfect)</option>
-                    <option value="indicative.future_perfect">Futuro Compuesto (Future Perfect)</option>
-                    <option value="indicative.conditional_perfect">Condicional Compuesto (Conditional Perfect)</option>
-                </optgroup>
-                <optgroup label="Subjunctive Mood (Modo Subjuntivo)">
-                    <option value="subjunctive.present">Presente de Subjuntivo</option>
-                    <option value="subjunctive.imperfect">Imperfecto de Subjuntivo</option>
-                    <option value="subjunctive.present_perfect">Pretérito Perfecto de Subjuntivo</option>
-                </optgroup>
-                <optgroup label="Imperative Mood (Modo Imperativo)">
-                    <option value="imperative.positive">Imperativo Afirmativo (Commands)</option>
-                    <option value="imperative.negative">Imperativo Negativo (Negative Commands)</option>
-                </optgroup>
-                <optgroup label="Non-Finite Forms (Formas no Personales)">
-                    <option value="non_finite.infinitive">Infinitivo (Infinitive)</option>
-                    <option value="non_finite.gerund">Gerundio (Gerund)</option>
-                    <option value="non_finite.past_participle">Participio Pasado (Past Participle)</option>
-                </optgroup>
-            </select>
-            <button id="random-btn" class="mode-btn">Random Mode</button>
+        <!-- Collapsible Filter Panel -->
+        <div class="filter-panel">
+            <button class="filter-toggle-btn" id="filter-toggle-btn">
+                <span class="filter-toggle-icon" id="filter-toggle-icon">▶</span>
+                <span>Filters</span>
+                <span class="filter-summary" id="filter-summary"></span>
+            </button>
+            <div class="filter-body hidden" id="filter-body">
+                <div class="filter-columns">
+                    <div class="filter-col">
+                        <div class="filter-col-header">
+                            <span class="filter-col-title">Topics</span>
+                            <div class="filter-col-actions">
+                                <button class="filter-action-btn" id="topics-all-btn">All</button>
+                                <button class="filter-action-btn" id="topics-none-btn">None</button>
+                            </div>
+                        </div>
+                        <div class="filter-list" id="topic-list"></div>
+                    </div>
+                    <div class="filter-col">
+                        <div class="filter-col-header">
+                            <span class="filter-col-title">Verbs</span>
+                            <div class="filter-col-actions">
+                                <button class="filter-action-btn" id="verbs-all-btn">All</button>
+                                <button class="filter-action-btn" id="verbs-none-btn">None</button>
+                                <button class="filter-action-btn" id="verbs-irregular-btn">Irregular</button>
+                            </div>
+                        </div>
+                        <p class="verb-filter-note" id="verb-filter-note">No verbs checked = all verbs used</p>
+                        <div class="filter-list" id="verb-list"></div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <main class="card">
@@ -57,7 +60,7 @@
             </div>
 
             <div class="input-area">
-                <input type="text" id="answer-input" placeholder="Type conjugation here..." autocomplete="off">
+                <input type="text" id="answer-input" placeholder="Type your answer here..." autocomplete="off">
 
                 <div class="virtual-keyboard">
                     <button type="button" data-char="á">á</button>
@@ -73,7 +76,7 @@
 
             <div class="action-row">
                 <button id="back-btn" class="secondary-btn hidden">← Back</button>
-                <button id="next-btn" class="secondary-btn hidden">Next Verb</button>
+                <button id="next-btn" class="secondary-btn hidden">Next →</button>
             </div>
 
             <div id="feedback" class="feedback hidden">
@@ -81,7 +84,7 @@
                 <p id="correct-answer-display" class="hidden">Correct: <span id="correct-text"></span></p>
             </div>
 
-            <button id="show-conjugations-btn" class="info-btn hidden">Show All Conjugations</button>
+            <button id="show-conjugations-btn" class="info-btn hidden">Show All Forms</button>
 
             <div id="conjugation-table-container" class="hidden">
                 <h3 id="conjugation-table-title" class="conjugation-table-title"></h3>
@@ -96,10 +99,11 @@
 
         <footer class="info-box">
             <h3>Quick Tip:</h3>
-            <p id="tense-tip">The Preterite is for completed past actions. (e.g., "Yesterday I ate.")</p>
+            <p id="tense-tip">Open Filters above to choose which tenses and verbs to practice.</p>
         </footer>
     </div>
 
+    <script src="grammar.js"></script>
     <script src="verbs.js"></script>
     <script src="script.js"></script>
 </body>
