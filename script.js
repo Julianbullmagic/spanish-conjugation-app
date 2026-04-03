@@ -15,6 +15,7 @@ let questionHistory = []; // each entry: { type, key, verbIndex?, mood?, tense?,
 let historyIndex = -1;
 let removedKeys = new Set();
 let correctCounts = {};
+let lastVerbIndex = -1;
 
 // ===== DOM =====
 const verbEl              = document.getElementById('prompt-verb');
@@ -176,17 +177,23 @@ function onTopicChange(e) {
     const key = e.target.dataset.topic;
     if (e.target.checked) selectedTopics.add(key);
     else selectedTopics.delete(key);
-    filterDirty = true;
-    updateFilterSummary();
+    markFilterDirty();
 }
 
 function onVerbChange(e) {
     const idx = parseInt(e.target.dataset.verb);
     if (e.target.checked) selectedVerbIndices.add(idx);
     else selectedVerbIndices.delete(idx);
+    markFilterDirty();
+    updateVerbNote();
+}
+
+function markFilterDirty() {
     filterDirty = true;
     updateFilterSummary();
-    updateVerbNote();
+    const applyBtn = document.getElementById('apply-filters-btn');
+    applyBtn.classList.add('dirty');
+    applyBtn.textContent = 'Apply Filters ✓';
 }
 
 function updateFilterSummary() {
@@ -207,11 +214,6 @@ function toggleFilter() {
     filterOpen = !filterOpen;
     filterBody.classList.toggle('hidden', !filterOpen);
     filterToggleIcon.textContent = filterOpen ? '▼' : '▶';
-
-    if (!filterOpen && filterDirty) {
-        filterDirty = false;
-        applyFilters();
-    }
 }
 
 function applyFilters() {
@@ -221,6 +223,7 @@ function applyFilters() {
     streakEl.textContent = streak;
     questionHistory = [];
     historyIndex = -1;
+    lastVerbIndex = -1;
     buildQuestionPool();
     refillQueue();
     generateNextNewQuestion();
@@ -267,7 +270,17 @@ function refillQueue() {
 function getNextQuestion() {
     if (questionQueue.length === 0) refillQueue();
     if (questionQueue.length === 0) return null;
-    return questionQueue.shift();
+
+    // Prefer a question from a different verb than the last one asked
+    let idx = 0;
+    if (lastVerbIndex !== -1 && questionQueue.length > 1) {
+        const alt = questionQueue.findIndex(q => q.type !== 'verb' || q.verbIndex !== lastVerbIndex);
+        if (alt !== -1) idx = alt;
+    }
+
+    const [q] = questionQueue.splice(idx, 1);
+    lastVerbIndex = q.type === 'verb' ? q.verbIndex : -1;
+    return q;
 }
 
 function scheduleRepetitions(q, count) {
@@ -600,42 +613,47 @@ function setupEventListeners() {
     removeBtn.addEventListener('click', removeCurrentQuestion);
     filterToggleBtn.addEventListener('click', toggleFilter);
     showConjugationsBtn.addEventListener('click', toggleConjugationTable);
+    document.getElementById('apply-filters-btn').addEventListener('click', () => {
+        filterDirty = false;
+        const applyBtn = document.getElementById('apply-filters-btn');
+        applyBtn.classList.remove('dirty');
+        applyBtn.textContent = 'Apply Filters';
+        filterOpen = false;
+        filterBody.classList.add('hidden');
+        filterToggleIcon.textContent = '▶';
+        applyFilters();
+    });
 
     // Topic filter buttons
     document.getElementById('topics-all-btn').addEventListener('click', () => {
         TOPIC_CONFIGS.forEach(c => selectedTopics.add(c.key));
-        filterDirty = true;
         renderTopicList();
-        updateFilterSummary();
+        markFilterDirty();
     });
     document.getElementById('topics-none-btn').addEventListener('click', () => {
         selectedTopics.clear();
-        filterDirty = true;
         renderTopicList();
-        updateFilterSummary();
+        markFilterDirty();
     });
 
     // Verb filter buttons
     document.getElementById('verbs-all-btn').addEventListener('click', () => {
         VERB_DATA.forEach((_, i) => selectedVerbIndices.add(i));
-        filterDirty = true;
         renderVerbList();
-        updateFilterSummary();
+        markFilterDirty();
     });
     document.getElementById('verbs-none-btn').addEventListener('click', () => {
         selectedVerbIndices.clear();
-        filterDirty = true;
         renderVerbList();
-        updateFilterSummary();
+        markFilterDirty();
     });
     document.getElementById('verbs-irregular-btn').addEventListener('click', () => {
         selectedVerbIndices.clear();
         VERB_DATA.forEach((verb, i) => {
             if (IRREGULAR_VERBS.has(verb.infinitive)) selectedVerbIndices.add(i);
         });
-        filterDirty = true;
         renderVerbList();
-        updateFilterSummary();
+        markFilterDirty();
     });
 
     // Enter key

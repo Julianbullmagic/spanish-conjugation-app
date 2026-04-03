@@ -526,6 +526,33 @@ select.disabled {
     flex-shrink: 0;
 }
 
+.filter-apply-row {
+    margin-top: 12px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.filter-apply-btn {
+    padding: 8px 22px;
+    border: 2px solid var(--primary-color);
+    border-radius: 20px;
+    background: white;
+    color: var(--primary-color);
+    font-size: 0.9rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+}
+
+.filter-apply-btn:hover {
+    background: var(--secondary-color);
+}
+
+.filter-apply-btn.dirty {
+    background: var(--primary-color);
+    color: white;
+}
+
 .table-note {
     font-size: 0.8rem;
     color: #666;
