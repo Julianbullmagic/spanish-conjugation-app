@@ -46,6 +46,11 @@ const filterSummary      = document.getElementById('filter-summary');
 const topicList          = document.getElementById('topic-list');
 const verbList           = document.getElementById('verb-list');
 const verbFilterNote     = document.getElementById('verb-filter-note');
+const ruleToggleBtn      = document.getElementById('rule-toggle-btn');
+const ruleBody           = document.getElementById('rule-body');
+const ruleToggleIcon     = document.getElementById('rule-toggle-icon');
+const ruleContentEl      = document.getElementById('rule-content');
+const ruleExceptionsEl   = document.getElementById('rule-exceptions');
 
 // ===== TIPS =====
 const TIPS = {
@@ -353,6 +358,7 @@ function loadHistoryEntry(index) {
         const topicKey = `${entry.mood}.${entry.tense}`;
         randomTenseLabel.textContent = TENSE_NAMES[topicKey] || '';
         tenseTip.textContent = TIPS[topicKey] || '';
+        updateRuleSection(topicKey);
 
     } else if (entry.type === 'grammar') {
         const data = GRAMMAR_DATA[entry.subtype];
@@ -367,6 +373,7 @@ function loadHistoryEntry(index) {
         const topicKey = `grammar.${entry.subtype}`;
         randomTenseLabel.textContent = TENSE_NAMES[topicKey] || '';
         tenseTip.textContent = TIPS[topicKey] || '';
+        updateRuleSection(topicKey);
     }
 
     randomTenseLabel.classList.remove('hidden');
@@ -519,6 +526,30 @@ function updateNavButtons() {
     removeBtn.classList.toggle('hidden', !isAnswerChecked);
 }
 
+// ===== RULE SECTION =====
+let ruleOpen = false;
+
+function updateRuleSection(topicKey) {
+    const rules = CONJUGATION_RULES[topicKey];
+    if (rules) {
+        ruleContentEl.innerHTML = rules.rule;
+        ruleExceptionsEl.innerHTML = rules.exceptions;
+        ruleToggleBtn.closest('.rule-section').classList.remove('hidden');
+    } else {
+        ruleToggleBtn.closest('.rule-section').classList.add('hidden');
+    }
+    // Collapse when question changes
+    ruleOpen = false;
+    ruleBody.classList.add('hidden');
+    ruleToggleIcon.textContent = '▶';
+}
+
+function toggleRuleSection() {
+    ruleOpen = !ruleOpen;
+    ruleBody.classList.toggle('hidden', !ruleOpen);
+    ruleToggleIcon.textContent = ruleOpen ? '▼' : '▶';
+}
+
 // ===== FORMS TABLE =====
 function toggleConjugationTable() {
     const visible = !conjugationTableContainer.classList.contains('hidden');
@@ -612,6 +643,7 @@ function setupEventListeners() {
     backBtn.addEventListener('click', goBack);
     removeBtn.addEventListener('click', removeCurrentQuestion);
     filterToggleBtn.addEventListener('click', toggleFilter);
+    ruleToggleBtn.addEventListener('click', toggleRuleSection);
     showConjugationsBtn.addEventListener('click', toggleConjugationTable);
     document.getElementById('apply-filters-btn').addEventListener('click', () => {
         filterDirty = false;

@@ -562,6 +562,72 @@ select.disabled {
     text-align: center;
 }
 
+/* ===== Rule Section ===== */
+
+.rule-section {
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.rule-toggle-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    background: #f5f5f5;
+    border: none;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: var(--primary-dark);
+    text-align: left;
+    transition: background 0.15s;
+}
+
+.rule-toggle-btn:hover {
+    background: var(--secondary-color);
+}
+
+.rule-toggle-icon {
+    font-size: 0.65rem;
+    transition: transform 0.2s;
+}
+
+.rule-body {
+    border-top: 1px solid #e0e0e0;
+    padding: 12px 14px 14px;
+    background: #fafafa;
+}
+
+.rule-block {
+    margin-bottom: 10px;
+}
+
+.rule-block:last-child {
+    margin-bottom: 0;
+}
+
+.rule-heading {
+    font-size: 0.78rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--primary-color);
+    margin-bottom: 4px;
+}
+
+.rule-content {
+    font-size: 0.85rem;
+    line-height: 1.55;
+    color: #555;
+}
+
+.rule-content b {
+    color: var(--text-color);
+}
+
 @media (max-width: 420px) {
     .filter-columns {
         flex-direction: column;
