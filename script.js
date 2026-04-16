@@ -73,6 +73,10 @@ const TIPS = {
     'non_finite.past_participle':    "Past Participle: Used in compound tenses. (e.g., 'Spoken' — Hablado).",
     'grammar.possessive_unstressed': "Possessive Adj. (Unstressed/Átonos): Come BEFORE the noun. mi/tu/su agree only in number; nuestro/vuestro also agree in gender.",
     'grammar.possessive_stressed':   "Possessive Adj. (Stressed/Tónicos): Come AFTER the noun or stand alone. Agree in BOTH gender and number with the noun.",
+    'grammar.demonstrative':         "Demonstrative Adj.: agree in gender & number. este/a = this (near), ese/a = that (there), aquel/aquella = that (far over there).",
+    'grammar.direct_object':         "Direct Object Pronouns: me, te, lo/la, nos, os, los/las. Go BEFORE the verb. Replace the noun receiving the action directly.",
+    'grammar.indirect_object':       "Indirect Object Pronouns: me, te, le, nos, os, les. Go BEFORE the verb. Show to/for whom the action is done.",
+    'grammar.reflexive':             "Reflexive Pronouns: me, te, se, nos, os, se. Used when the subject acts on itself (e.g., lavarse = to wash oneself).",
 };
 
 const TENSE_NAMES = {
@@ -95,6 +99,10 @@ const TENSE_NAMES = {
     'non_finite.past_participle':    'Past Participle',
     'grammar.possessive_unstressed': 'Possessive Adj. (Unstressed)',
     'grammar.possessive_stressed':   'Possessive Adj. (Stressed)',
+    'grammar.demonstrative':         'Demonstrative Adj.',
+    'grammar.direct_object':         'Direct Object Pronouns',
+    'grammar.indirect_object':       'Indirect Object Pronouns',
+    'grammar.reflexive':             'Reflexive Pronouns',
 };
 
 // ===== INIT =====
@@ -364,11 +372,11 @@ function loadHistoryEntry(index) {
         const data = GRAMMAR_DATA[entry.subtype];
         const item = data[entry.questionIndex];
 
-        pronounEl.textContent = item.owner;
-        verbEl.textContent = entry.subtype === 'possessive_unstressed'
-            ? `__ ${item.noun}`
-            : `${item.noun} __`;
-        translationEl.textContent = `(${item.ownerMeaning} ${item.nounTranslation})`;
+        pronounEl.textContent = item.label !== undefined ? item.label : item.owner;
+        verbEl.textContent = item.prompt !== undefined ? item.prompt
+            : (entry.subtype === 'possessive_unstressed' ? `__ ${item.noun}` : `${item.noun} __`);
+        translationEl.textContent = item.hint !== undefined ? item.hint
+            : `(${item.ownerMeaning} ${item.nounTranslation})`;
 
         const topicKey = `grammar.${entry.subtype}`;
         randomTenseLabel.textContent = TENSE_NAMES[topicKey] || '';
@@ -598,30 +606,33 @@ function buildVerbTable(entry) {
 }
 
 function buildGrammarTable(entry) {
-    const tableKey = entry.subtype === 'possessive_unstressed' ? 'unstressed' : 'stressed';
-    const table = POSSESSIVE_ADJ_TABLES[tableKey];
     const item = GRAMMAR_DATA[entry.subtype][entry.questionIndex];
-    const ownerBase = item.owner.split('/')[0];
+    const table = GRAMMAR_TABLES[entry.subtype];
+    if (!table) return;
 
     conjugationTableTitle.textContent = table.title;
 
-    // Note row in tbody
-    const noteRow = document.createElement('tr');
-    noteRow.innerHTML = `<td colspan="${table.headers.length}" class="table-note">${table.note}</td>`;
-    conjugationTbody.appendChild(noteRow);
+    if (table.note) {
+        const noteRow = document.createElement('tr');
+        noteRow.innerHTML = `<td colspan="${table.headers.length}" class="table-note">${table.note}</td>`;
+        conjugationTbody.appendChild(noteRow);
+    }
 
-    // Header
     const headerRow = document.createElement('tr');
     headerRow.innerHTML = table.headers.map(h => `<th>${h}</th>`).join('');
     conjugationThead.appendChild(headerRow);
 
-    // Data rows — highlight cell that matches the answer in the owner's row
-    table.rows.forEach(row => {
+    // Highlight: new items use rowIndex; old possessive items fall back to owner matching
+    table.rows.forEach((row, rowIdx) => {
         const tr = document.createElement('tr');
-        const ownerMatch = row[0].toLowerCase().includes(ownerBase.toLowerCase());
-        tr.innerHTML = row.map((cell, i) => {
-            const isHighlight = i > 0 && ownerMatch && cell === item.answer;
-            const cls = i === 0 ? 'pronoun-cell' : (isHighlight ? 'highlight' : '');
+        const isTargetRow = item.rowIndex !== undefined
+            ? rowIdx === item.rowIndex
+            : item.owner
+                ? row[0].toLowerCase().includes(item.owner.split('/')[0].toLowerCase())
+                : false;
+        tr.innerHTML = row.map((cell, colIdx) => {
+            const isHighlight = colIdx > 0 && isTargetRow && cell === item.answer;
+            const cls = colIdx === 0 ? 'pronoun-cell' : (isHighlight ? 'highlight' : '');
             return `<td class="${cls}">${cell}</td>`;
         }).join('');
         conjugationTbody.appendChild(tr);

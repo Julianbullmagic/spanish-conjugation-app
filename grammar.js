@@ -372,4 +372,37 @@ const CONJUGATION_RULES = {
                      <b>su/sus</b> same ambiguity as unstressed form<br>
                      <b>Neuter lo nuestro</b> = "what's ours" (abstract)`
     },
+    'grammar.demonstrative': {
+        rule: `<b>Demonstratives agree in gender and number</b> with the noun:<br>
+               <b>Near (este/a/os/as):</b> this/these — near the speaker (aquí)<br>
+               <b>Mid (ese/a/os/as):</b> that/those — near the listener (ahí)<br>
+               <b>Far (aquel/aquella/os/as):</b> that/those — distant from both (allí)`,
+        exceptions: `<b>Neuter forms</b> (no gender, used alone): esto, eso, aquello<br>
+                     <b>Pronouns vs. adjectives:</b> accent marks (éste, ése) are now optional per RAE — either is acceptable<br>
+                     <b>aquel</b> has irregular fem. <i>aquella</i>, not <i>aquela</i>`
+    },
+    'grammar.direct_object': {
+        rule: `<b>Direct object pronouns</b> replace the noun receiving the action directly:<br>
+               me, te, lo/la, nos, os, los/las<br>
+               Placed <b>before the conjugated verb</b>: "Yo lo veo." (I see him/it.)`,
+        exceptions: `<b>With infinitive or gerund:</b> attach to end OR keep before: "Voy a verlo" / "Lo voy a ver"<br>
+                     <b>With affirmative commands:</b> always attach: "¡Cómelo!" (Eat it!)<br>
+                     <b>lo</b> = him / it (m.) — <b>la</b> = her / it (f.) — <b>lo</b> also used as formal Ud. (m.)`
+    },
+    'grammar.indirect_object': {
+        rule: `<b>Indirect object pronouns</b> show to/for whom the action is done:<br>
+               me, te, le, nos, os, les<br>
+               Placed <b>before the conjugated verb</b>: "Te doy el libro." (I give you the book.)`,
+        exceptions: `<b>le/les → se</b> before lo/la/los/las: "Le lo doy" ✗ → "Se lo doy" ✓<br>
+                     <b>Redundant pronoun:</b> with a noun I.O., add the pronoun too: "Le escribo a María"<br>
+                     <b>Clarification:</b> le/les are ambiguous → add "a él/ella/Ud./ellos…" to clarify`
+    },
+    'grammar.reflexive': {
+        rule: `<b>Reflexive pronouns</b> show the subject acts on itself:<br>
+               me, te, se, nos, os, se<br>
+               Placed <b>before the conjugated verb</b>: "Me lavo." (I wash myself.)`,
+        exceptions: `<b>Reciprocal use:</b> nos/os/se can mean "each other": "Nos queremos" (We love each other)<br>
+                     <b>Passive se:</b> "Se habla español." (Spanish is spoken.)<br>
+                     <b>Impersonal se:</b> "Se dice que…" (It is said that…)`
+    },
 };
