@@ -20,6 +20,10 @@ const TOPIC_CONFIGS = [
     { key: 'non_finite.past_participle',     type: 'verb', mood: 'non_finite',  tense: 'past_participle',     pronounCount: 1, label: 'Past Participle',       group: 'Non-Finite Forms' },
     { key: 'grammar.possessive_unstressed',  type: 'grammar', subtype: 'possessive_unstressed', label: 'Possessive Adj. (unstressed)', group: 'Grammar' },
     { key: 'grammar.possessive_stressed',    type: 'grammar', subtype: 'possessive_stressed',   label: 'Possessive Adj. (stressed)',   group: 'Grammar' },
+    { key: 'grammar.demonstrative',          type: 'grammar', subtype: 'demonstrative',         label: 'Demonstrative Adj.',           group: 'Grammar' },
+    { key: 'grammar.direct_object',          type: 'grammar', subtype: 'direct_object',         label: 'Direct Object Pronouns',       group: 'Grammar' },
+    { key: 'grammar.indirect_object',        type: 'grammar', subtype: 'indirect_object',       label: 'Indirect Object Pronouns',     group: 'Grammar' },
+    { key: 'grammar.reflexive',              type: 'grammar', subtype: 'reflexive',             label: 'Reflexive Pronouns',           group: 'Grammar' },
 ];
 
 // Verbs with any stem change, spelling change, or highly irregular paradigm
@@ -78,15 +82,82 @@ const POSSESSIVE_ADJ_STRESSED = [
     { owner: 'ellos/ellas/Uds.', ownerMeaning: 'theirs/yours (form. pl.)',      noun: 'ideas',      nounTranslation: 'ideas (f)',     answer: 'suyas' },
 ];
 
+// --- Demonstrative Adjective Questions ---
+
+const DEMONSTRATIVE_ADJ = [
+    // near (este/a/os/as)
+    { label: 'near — m. sg.',  prompt: '__ libro',     hint: '(this book)',                   answer: 'este',     rowIndex: 0 },
+    { label: 'near — f. sg.',  prompt: '__ silla',     hint: '(this chair)',                  answer: 'esta',     rowIndex: 0 },
+    { label: 'near — m. pl.',  prompt: '__ zapatos',   hint: '(these shoes)',                 answer: 'estos',    rowIndex: 0 },
+    { label: 'near — f. pl.',  prompt: '__ flores',    hint: '(these flowers)',               answer: 'estas',    rowIndex: 0 },
+    // mid (ese/a/os/as)
+    { label: 'mid — m. sg.',   prompt: '__ edificio',  hint: '(that building)',               answer: 'ese',      rowIndex: 1 },
+    { label: 'mid — f. sg.',   prompt: '__ mesa',      hint: '(that table)',                  answer: 'esa',      rowIndex: 1 },
+    { label: 'mid — m. pl.',   prompt: '__ coches',    hint: '(those cars)',                  answer: 'esos',     rowIndex: 1 },
+    { label: 'mid — f. pl.',   prompt: '__ ventanas',  hint: '(those windows)',               answer: 'esas',     rowIndex: 1 },
+    // far (aquel/aquella/os/as)
+    { label: 'far — m. sg.',   prompt: '__ árbol',     hint: '(that tree over there)',        answer: 'aquel',    rowIndex: 2 },
+    { label: 'far — f. sg.',   prompt: '__ montaña',   hint: '(that mountain over there)',    answer: 'aquella',  rowIndex: 2 },
+    { label: 'far — m. pl.',   prompt: '__ árboles',   hint: '(those trees over there)',      answer: 'aquellos', rowIndex: 2 },
+    { label: 'far — f. pl.',   prompt: '__ montañas',  hint: '(those mountains over there)',  answer: 'aquellas', rowIndex: 2 },
+];
+
+// --- Direct Object Pronoun Questions ---
+
+const DIRECT_OBJ_PRONOUNS = [
+    { label: 'yo → D.O.',         prompt: 'Ella __ llama.',           hint: '(She calls me.)',                   answer: 'me',  rowIndex: 0 },
+    { label: 'tú → D.O.',         prompt: 'Yo __ veo.',               hint: '(I see you.)',                      answer: 'te',  rowIndex: 1 },
+    { label: 'él → D.O.',         prompt: 'Nosotros __ invitamos.',   hint: '(We invite him.)',                  answer: 'lo',  rowIndex: 2 },
+    { label: 'ella → D.O.',       prompt: 'Tú __ buscas.',            hint: '(You look for her.)',               answer: 'la',  rowIndex: 3 },
+    { label: 'Ud. (m.) → D.O.',   prompt: 'Yo __ conozco.',           hint: '(I know you [m., formal].)',        answer: 'lo',  rowIndex: 2 },
+    { label: 'Ud. (f.) → D.O.',   prompt: 'Él __ respeta.',           hint: '(He respects you [f., formal].)',   answer: 'la',  rowIndex: 3 },
+    { label: 'nosotros → D.O.',   prompt: 'Ellos __ buscan.',         hint: '(They look for us.)',               answer: 'nos', rowIndex: 4 },
+    { label: 'vosotros → D.O.',   prompt: 'Él __ llama.',             hint: '(He calls you all [Spain].)',       answer: 'os',  rowIndex: 5 },
+    { label: 'ellos → D.O.',      prompt: 'Ella __ ve.',              hint: '(She sees them [m.].)',             answer: 'los', rowIndex: 6 },
+    { label: 'ellas → D.O.',      prompt: 'Tú __ escuchas.',          hint: '(You listen to them [f.].)',        answer: 'las', rowIndex: 7 },
+    { label: 'Uds. (m.) → D.O.',  prompt: 'Yo __ entiendo.',          hint: '(I understand you all [m.].)',      answer: 'los', rowIndex: 6 },
+    { label: 'Uds. (f.) → D.O.',  prompt: 'Nosotros __ admiramos.',   hint: '(We admire you all [f.].)',         answer: 'las', rowIndex: 7 },
+];
+
+// --- Indirect Object Pronoun Questions ---
+
+const INDIRECT_OBJ_PRONOUNS = [
+    { label: 'yo → I.O.',              prompt: 'Ella __ da un regalo.',           hint: '(She gives me a gift.)',              answer: 'me',  rowIndex: 0 },
+    { label: 'tú → I.O.',              prompt: 'Yo __ digo la verdad.',           hint: '(I tell you the truth.)',             answer: 'te',  rowIndex: 1 },
+    { label: 'él → I.O.',              prompt: 'Nosotros __ mandamos una carta.', hint: '(We send him a letter.)',             answer: 'le',  rowIndex: 2 },
+    { label: 'ella → I.O.',            prompt: 'Tú __ escribes un mensaje.',      hint: '(You write her a message.)',          answer: 'le',  rowIndex: 2 },
+    { label: 'Ud. → I.O.',             prompt: 'Él __ explica el problema.',      hint: '(He explains the problem to you.)',   answer: 'le',  rowIndex: 2 },
+    { label: 'nosotros → I.O.',        prompt: 'Ellos __ explican todo.',         hint: '(They explain everything to us.)',    answer: 'nos', rowIndex: 3 },
+    { label: 'vosotros → I.O.',        prompt: 'Ella __ prepara la cena.',        hint: '(She prepares dinner for you all.)',  answer: 'os',  rowIndex: 4 },
+    { label: 'ellos → I.O.',           prompt: 'Yo __ hablo con claridad.',       hint: '(I speak to them clearly.)',          answer: 'les', rowIndex: 5 },
+    { label: 'Uds. → I.O.',            prompt: 'Nosotros __ damos la respuesta.', hint: '(We give you all the answer.)',       answer: 'les', rowIndex: 5 },
+];
+
+// --- Reflexive Pronoun Questions ---
+
+const REFLEXIVE_PRONOUNS = [
+    { label: 'yo (reflexivo)',          prompt: 'Yo __ lavo las manos.',     hint: '(I wash my hands.)',           answer: 'me',  rowIndex: 0 },
+    { label: 'tú (reflexivo)',          prompt: 'Tú __ levantas tarde.',     hint: '(You get up late.)',           answer: 'te',  rowIndex: 1 },
+    { label: 'él/ella (reflexivo)',     prompt: 'Ella __ viste rápido.',     hint: '(She gets dressed quickly.)', answer: 'se',  rowIndex: 2 },
+    { label: 'Ud. (reflexivo)',         prompt: 'Ud. __ sienta aquí.',       hint: '(You sit down here.)',         answer: 'se',  rowIndex: 2 },
+    { label: 'nosotros (reflexivo)',    prompt: 'Nosotros __ dormimos.',     hint: '(We go to sleep.)',            answer: 'nos', rowIndex: 3 },
+    { label: 'vosotros (reflexivo)',    prompt: 'Vosotros __ sentáis.',      hint: '(You all sit down.)',          answer: 'os',  rowIndex: 4 },
+    { label: 'ellos (reflexivo)',       prompt: 'Ellos __ despiertan.',      hint: '(They wake up.)',              answer: 'se',  rowIndex: 5 },
+];
+
 const GRAMMAR_DATA = {
     possessive_unstressed: POSSESSIVE_ADJ_UNSTRESSED,
     possessive_stressed:   POSSESSIVE_ADJ_STRESSED,
+    demonstrative:         DEMONSTRATIVE_ADJ,
+    direct_object:         DIRECT_OBJ_PRONOUNS,
+    indirect_object:       INDIRECT_OBJ_PRONOUNS,
+    reflexive:             REFLEXIVE_PRONOUNS,
 };
 
 // --- Reference tables shown when "Show All Forms" is clicked ---
 
-const POSSESSIVE_ADJ_TABLES = {
-    unstressed: {
+const GRAMMAR_TABLES = {
+    possessive_unstressed: {
         title: 'Possessive Adjectives — Unstressed (Átonos)',
         note: 'Come BEFORE the noun. mi/tu/su agree only in number; nuestro/vuestro also agree in gender.',
         headers: ['Owner', 'Singular', 'Plural'],
@@ -101,7 +172,7 @@ const POSSESSIVE_ADJ_TABLES = {
             ['ellos/Uds.',     'su',      'sus'],
         ],
     },
-    stressed: {
+    possessive_stressed: {
         title: 'Possessive Adjectives — Stressed (Tónicos)',
         note: 'Come AFTER the noun or stand alone. Agree in BOTH gender and number.',
         headers: ['Owner', 'Masc. Sg.', 'Fem. Sg.', 'Masc. Pl.', 'Fem. Pl.'],
@@ -112,6 +183,57 @@ const POSSESSIVE_ADJ_TABLES = {
             ['nosotros/as',    'nuestro', 'nuestra', 'nuestros', 'nuestras'],
             ['vosotros/as',    'vuestro', 'vuestra', 'vuestros', 'vuestras'],
             ['ellos/Uds.',     'suyo',    'suya',    'suyos',    'suyas'],
+        ],
+    },
+    demonstrative: {
+        title: 'Demonstrative Adjectives (Adjetivos Demostrativos)',
+        note: 'Agree in gender and number with the noun they modify.',
+        headers: ['Distance', 'M. Sg.', 'F. Sg.', 'M. Pl.', 'F. Pl.'],
+        rows: [
+            ['near (aquí)',  'este',    'esta',    'estos',    'estas'],
+            ['mid (ahí)',    'ese',     'esa',     'esos',     'esas'],
+            ['far (allí)',   'aquel',   'aquella', 'aquellos', 'aquellas'],
+        ],
+    },
+    direct_object: {
+        title: 'Direct Object Pronouns (Pronombres de Objeto Directo)',
+        note: 'Replace the noun receiving the action directly. Go BEFORE conjugated verbs.',
+        headers: ['Subject', 'D.O. Pronoun'],
+        rows: [
+            ['yo',              'me'],
+            ['tú',              'te'],
+            ['él/Ud.(m.)',      'lo'],
+            ['ella/Ud.(f.)',    'la'],
+            ['nosotros/as',     'nos'],
+            ['vosotros/as',     'os'],
+            ['ellos/Uds.(m.)',  'los'],
+            ['ellas/Uds.(f.)',  'las'],
+        ],
+    },
+    indirect_object: {
+        title: 'Indirect Object Pronouns (Pronombres de Objeto Indirecto)',
+        note: 'Show to/for whom the action is done. Go BEFORE conjugated verbs.',
+        headers: ['Subject', 'I.O. Pronoun'],
+        rows: [
+            ['yo',               'me'],
+            ['tú',               'te'],
+            ['él/ella/Ud.',      'le'],
+            ['nosotros/as',      'nos'],
+            ['vosotros/as',      'os'],
+            ['ellos/ellas/Uds.', 'les'],
+        ],
+    },
+    reflexive: {
+        title: 'Reflexive Pronouns (Pronombres Reflexivos)',
+        note: 'Used when the subject performs the action on itself. Go BEFORE conjugated verbs.',
+        headers: ['Subject', 'Reflexive Pronoun'],
+        rows: [
+            ['yo',               'me'],
+            ['tú',               'te'],
+            ['él/ella/Ud.',      'se'],
+            ['nosotros/as',      'nos'],
+            ['vosotros/as',      'os'],
+            ['ellos/ellas/Uds.', 'se'],
         ],
     },
 };
