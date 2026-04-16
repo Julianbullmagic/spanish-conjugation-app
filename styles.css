@@ -100,6 +100,19 @@ select {
     color: #888;
 }
 
+.prompt .sentence {
+    font-size: 1.35rem;
+    color: var(--primary-color);
+    line-height: 1.6;
+    margin-bottom: 2px;
+}
+
+.prompt .sentence-translation {
+    font-style: italic;
+    color: #888;
+    font-size: 0.95rem;
+}
+
 .input-area {
     display: flex;
     flex-direction: column;

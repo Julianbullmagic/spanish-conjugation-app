@@ -3,6 +3,7 @@ let streak = 0;
 let isAnswerChecked = false;
 let filterOpen = false;
 let filterDirty = false;
+let sentenceMode = false;
 
 // Filter selections
 let selectedTopics = new Set(['indicative.preterite']);
@@ -51,6 +52,9 @@ const ruleBody           = document.getElementById('rule-body');
 const ruleToggleIcon     = document.getElementById('rule-toggle-icon');
 const ruleContentEl      = document.getElementById('rule-content');
 const ruleExceptionsEl   = document.getElementById('rule-exceptions');
+const sentenceModeBtn    = document.getElementById('sentence-mode-btn');
+const sentenceEl         = document.getElementById('prompt-sentence');
+const sentenceEnEl       = document.getElementById('prompt-sentence-en');
 
 // ===== TIPS =====
 const TIPS = {
@@ -275,9 +279,17 @@ function buildQuestionPool() {
     });
 }
 
+function shuffle(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+}
+
 function refillQueue() {
     buildQuestionPool();
-    questionQueue = [...questionPool].sort(() => Math.random() - 0.5);
+    questionQueue = shuffle([...questionPool]);
 }
 
 function getNextQuestion() {
@@ -339,6 +351,50 @@ function generateQuestion() {
     generateNextNewQuestion();
 }
 
+// ===== SENTENCE MODE =====
+function getSentencePair(entry) {
+    if (entry.type !== 'verb') return null;
+    const verbName = VERB_DATA[entry.verbIndex].infinitive;
+    const data = VERB_SENTENCES[verbName];
+    if (!data) return null;
+    if (entry.mood === 'non_finite') return data[entry.tense] || null;
+    const moodData = data[entry.mood];
+    if (!moodData) return null;
+    return moodData[entry.pronounIndex] || null;
+}
+
+function applyPromptDisplay(entry) {
+    const pair = getSentencePair(entry);
+    if (pair) {
+        sentenceModeBtn.classList.remove('hidden');
+        sentenceModeBtn.textContent = sentenceMode ? 'Standard Mode' : 'Use in Sentence';
+        sentenceModeBtn.classList.toggle('active', sentenceMode);
+    } else {
+        sentenceModeBtn.classList.add('hidden');
+    }
+
+    const showSentence = sentenceMode && pair;
+    pronounEl.classList.toggle('hidden', !!showSentence);
+    verbEl.classList.toggle('hidden', !!showSentence);
+    translationEl.classList.toggle('hidden', !!showSentence);
+
+    if (showSentence) {
+        sentenceEl.textContent = pair[0];
+        sentenceEl.classList.remove('hidden');
+        sentenceEnEl.textContent = pair[1];
+        sentenceEnEl.classList.remove('hidden');
+    } else {
+        sentenceEl.classList.add('hidden');
+        sentenceEnEl.classList.add('hidden');
+    }
+}
+
+function toggleSentenceMode() {
+    sentenceMode = !sentenceMode;
+    applyPromptDisplay(questionHistory[historyIndex]);
+    inputEl.focus();
+}
+
 function loadHistoryEntry(index) {
     const entry = questionHistory[index];
 
@@ -385,6 +441,7 @@ function loadHistoryEntry(index) {
     }
 
     randomTenseLabel.classList.remove('hidden');
+    applyPromptDisplay(entry);
 
     if (entry.wasCorrect !== null) {
         // Restoring an already-answered question
@@ -653,6 +710,7 @@ function setupEventListeners() {
     nextBtn.addEventListener('click', generateQuestion);
     backBtn.addEventListener('click', goBack);
     removeBtn.addEventListener('click', removeCurrentQuestion);
+    sentenceModeBtn.addEventListener('click', toggleSentenceMode);
     filterToggleBtn.addEventListener('click', toggleFilter);
     ruleToggleBtn.addEventListener('click', toggleRuleSection);
     showConjugationsBtn.addEventListener('click', toggleConjugationTable);
