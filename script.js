@@ -4,6 +4,7 @@ let isAnswerChecked = false;
 let filterOpen = false;
 let filterDirty = false;
 let sentenceMode = false;
+let irregularOnlyMode = false;
 
 // Filter selections
 let selectedTopics = new Set(['indicative.preterite']);
@@ -246,6 +247,97 @@ function applyFilters() {
     generateNextNewQuestion();
 }
 
+// ===== IRREGULAR CONJUGATION DETECTION =====
+function computeRegularForm(verb, mood, tense, pronounIndex) {
+    const inf = verb.infinitive;
+    const ending = inf.slice(-2); // 'ar', 'er', or 'ir'
+    const stem = inf.slice(0, -2);
+    const pp = stem + (ending === 'ar' ? 'ado' : 'ido');
+
+    if (mood === 'indicative') {
+        if (tense === 'present') {
+            const E = { ar: ['o','as','a','amos','áis','an'], er: ['o','es','e','emos','éis','en'], ir: ['o','es','e','imos','ís','en'] };
+            return stem + E[ending][pronounIndex];
+        }
+        if (tense === 'preterite') {
+            const E = { ar: ['é','aste','ó','amos','asteis','aron'], er: ['í','iste','ió','imos','isteis','ieron'], ir: ['í','iste','ió','imos','isteis','ieron'] };
+            return stem + E[ending][pronounIndex];
+        }
+        if (tense === 'imperfect') {
+            const E = { ar: ['aba','abas','aba','ábamos','abais','aban'], er: ['ía','ías','ía','íamos','íais','ían'], ir: ['ía','ías','ía','íamos','íais','ían'] };
+            return stem + E[ending][pronounIndex];
+        }
+        if (tense === 'future')       return inf + ['é','ás','á','emos','éis','án'][pronounIndex];
+        if (tense === 'conditional')  return inf + ['ía','ías','ía','íamos','íais','ían'][pronounIndex];
+        const haberForms = {
+            present_perfect:    ['he','has','ha','hemos','habéis','han'],
+            past_perfect:       ['había','habías','había','habíamos','habíais','habían'],
+            future_perfect:     ['habré','habrás','habrá','habremos','habréis','habrán'],
+            conditional_perfect:['habría','habrías','habría','habríamos','habríais','habrían'],
+        };
+        if (haberForms[tense]) return haberForms[tense][pronounIndex] + ' ' + pp;
+    }
+
+    if (mood === 'subjunctive') {
+        if (tense === 'present') {
+            const E = { ar: ['e','es','e','emos','éis','en'], er: ['a','as','a','amos','áis','an'], ir: ['a','as','a','amos','áis','an'] };
+            return stem + E[ending][pronounIndex];
+        }
+        if (tense === 'imperfect') {
+            const E = { ar: ['ara','aras','ara','áramos','arais','aran'], er: ['iera','ieras','iera','iéramos','ierais','ieran'], ir: ['iera','ieras','iera','iéramos','ierais','ieran'] };
+            return stem + E[ending][pronounIndex];
+        }
+        if (tense === 'present_perfect') return ['haya','hayas','haya','hayamos','hayáis','hayan'][pronounIndex] + ' ' + pp;
+    }
+
+    if (mood === 'imperative') {
+        if (tense === 'positive') {
+            const E = { ar: [stem+'a',stem+'e',stem+'emos',stem+'ad',stem+'en'], er: [stem+'e',stem+'a',stem+'amos',stem+'ed',stem+'an'], ir: [stem+'e',stem+'a',stem+'amos',stem+'id',stem+'an'] };
+            return E[ending][pronounIndex];
+        }
+        if (tense === 'negative') {
+            const E = { ar: ['no '+stem+'es','no '+stem+'e','no '+stem+'emos','no '+stem+'éis','no '+stem+'en'], er: ['no '+stem+'as','no '+stem+'a','no '+stem+'amos','no '+stem+'áis','no '+stem+'an'], ir: ['no '+stem+'as','no '+stem+'a','no '+stem+'amos','no '+stem+'áis','no '+stem+'an'] };
+            return E[ending][pronounIndex];
+        }
+    }
+
+    if (mood === 'non_finite') {
+        if (tense === 'gerund')         return stem + (ending === 'ar' ? 'ando' : 'iendo');
+        if (tense === 'past_participle') return pp;
+        // infinitive is always trivially "regular" — skip
+    }
+
+    return null;
+}
+
+function isIrregularConjugation(entry) {
+    const verb = VERB_DATA[entry.verbIndex];
+    const regular = computeRegularForm(verb, entry.mood, entry.tense, entry.pronounIndex);
+    if (regular === null) return false;
+
+    let actual;
+    if (entry.mood === 'non_finite') {
+        actual = verb[entry.tense];
+    } else if (entry.mood === 'indicative' || entry.mood === 'subjunctive') {
+        actual = (verb.conjugations[entry.mood][entry.tense] || [])[entry.pronounIndex];
+    } else if (entry.mood === 'imperative') {
+        actual = (verb.conjugations.imperative[entry.tense] || [])[entry.pronounIndex];
+    }
+
+    return actual !== undefined && actual !== regular;
+}
+
+function updateIrregularPoolSizeLabel() {
+    const el = document.getElementById('irregular-pool-size');
+    if (!el) return;
+    if (irregularOnlyMode && questionPool.length > 0) {
+        el.textContent = `${questionPool.length} irregular form${questionPool.length !== 1 ? 's' : ''} in pool`;
+        el.classList.remove('hidden');
+    } else {
+        el.classList.add('hidden');
+    }
+}
+
 // ===== QUESTION POOL =====
 // When selectedVerbIndices is empty, all verbs are eligible for verb-type topics.
 function verbIsSelected(verbIndex) {
@@ -262,9 +354,12 @@ function buildQuestionPool() {
                 if (!verbIsSelected(verbIndex)) return;
                 for (let pi = 0; pi < cfg.pronounCount; pi++) {
                     const key = `v_${verbIndex}_${cfg.mood}_${cfg.tense}_${pi}`;
-                    if (!removedKeys.has(key)) {
-                        questionPool.push({ type: 'verb', key, verbIndex, mood: cfg.mood, tense: cfg.tense, pronounIndex: pi });
+                    if (removedKeys.has(key)) continue;
+                    if (irregularOnlyMode) {
+                        const entry = { type: 'verb', verbIndex, mood: cfg.mood, tense: cfg.tense, pronounIndex: pi };
+                        if (!isIrregularConjugation(entry)) continue;
                     }
+                    questionPool.push({ type: 'verb', key, verbIndex, mood: cfg.mood, tense: cfg.tense, pronounIndex: pi });
                 }
             });
         } else if (cfg.type === 'grammar') {
@@ -277,6 +372,7 @@ function buildQuestionPool() {
             });
         }
     });
+    updateIrregularPoolSizeLabel();
 }
 
 function shuffle(arr) {
@@ -711,6 +807,13 @@ function setupEventListeners() {
     backBtn.addEventListener('click', goBack);
     removeBtn.addEventListener('click', removeCurrentQuestion);
     sentenceModeBtn.addEventListener('click', toggleSentenceMode);
+
+    document.getElementById('irregular-only-toggle').addEventListener('change', e => {
+        irregularOnlyMode = e.target.checked;
+        buildQuestionPool();
+        refillQueue();
+        generateNextNewQuestion();
+    });
     filterToggleBtn.addEventListener('click', toggleFilter);
     ruleToggleBtn.addEventListener('click', toggleRuleSection);
     showConjugationsBtn.addEventListener('click', toggleConjugationTable);
